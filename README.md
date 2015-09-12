@@ -6,10 +6,10 @@ A small repository of code that contains my learning-experiments using the golan
 Highlights include:
 
 * 2fa
-   * Two-factor support using TOTP
+    * Two-factor support using TOTP
 * sub-command
-   * Writing binaries that allow subcommands.
+    * Writing binaries that allow subcommands.
 * local-ip
-   * Getting the local IP address of your system.
+    * Getting the local IP address of your system.
 * cidr-match
-   * Testing if IPs are within ranges
+    * Testing if IPs are within ranges
