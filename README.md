@@ -13,3 +13,5 @@ Highlights include:
    * Getting the local IP address of your system.
 * cidr-match
    * Testing if IPs are within ranges
+* hash-ids
+   * Test the hashing-library I use for generating "shortlinks"
