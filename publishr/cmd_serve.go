@@ -1,3 +1,10 @@
+/**
+ * Implementation for 'publishr serve'.
+ *
+ * This starts a HTTP-server which accepts uploads,
+ * and serves downloads.
+ */
+
 package main
 
 import (

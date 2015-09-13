@@ -1,3 +1,9 @@
+/**
+ * Implementation for 'publishr init'.
+ *
+ * Generate a random secret for TOTP-authentication.
+ */
+
 package main
 
 import (

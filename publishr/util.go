@@ -1,3 +1,8 @@
+/**
+ * Utility functions which we require, but didn't otherwise
+ * have an obvious home.
+ */
+
 package main
 
 import (

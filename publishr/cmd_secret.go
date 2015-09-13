@@ -1,3 +1,8 @@
+/**
+ * Implemetnation for 'publishr secret'.
+ *
+ * This shows the randomly-generated secret.
+ */
 package main
 
 import (
