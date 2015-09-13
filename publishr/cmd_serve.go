@@ -10,6 +10,7 @@ package main
 import (
 	"encoding/json"
 	"errors"
+	"flag"
 	"fmt"
 	"github.com/dgryski/dgoogauth"
 	"github.com/gorilla/mux"
@@ -275,6 +276,11 @@ func UploadHandler(res http.ResponseWriter, req *http.Request) {
  */
 func (r cmd_serve) execute(args ...string) int {
 
+	f1 := flag.NewFlagSet("f1", flag.ContinueOnError)
+	port := f1.String("port", "8081", "The port to bind to.")
+	host := f1.String("host", "127.0.0.1", "The host to listen upon.")
+	f1.Parse(args)
+
 	/* Create a router */
 	router := mux.NewRouter()
 
@@ -287,9 +293,12 @@ func (r cmd_serve) execute(args ...string) int {
 	/* Load the routers beneath the server root */
 	http.Handle("/", router)
 
+	/* Build up the bind-string */
+	bind := *host + ":" + *port
+
 	/* Launch the server */
-	fmt.Printf("Launching the server on http://0.0.0.0:8081\n")
-	err := http.ListenAndServe(":8081", nil)
+	fmt.Printf("Launching the server on http://%s\n", bind)
+	err := http.ListenAndServe(bind, nil)
 	if err != nil {
 		panic(err)
 	}
