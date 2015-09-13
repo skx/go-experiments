@@ -36,7 +36,7 @@ type subcommand interface {
 	// Get the public-facing name of the command.
 	name() string
 
-	// Execute the command , with an array of arguments.
+	// Execute the command, with an array of arguments.
 	execute(...string) int
 }
 
