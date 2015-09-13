@@ -52,14 +52,9 @@ func (r cmd_init) execute(args ...string) int {
 
 		secret := base32.StdEncoding.EncodeToString(sec)
 
-		state := &PublishrState{Secret: secret,
-			Count: 0}
+		state := &PublishrState{Secret: secret, Count: 0}
 
-		state_json, _ := json.Marshal(state)
-
-		f, err := os.Create(path)
-		defer f.Close()
-		f.WriteString(string(state_json))
+		SaveState(state)
 
 	} else {
 		fmt.Printf("Already initialized - to remove the config please run:\n")

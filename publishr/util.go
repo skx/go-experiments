@@ -9,7 +9,10 @@ import (
 	"encoding/json"
 	"io/ioutil"
 	"os"
+	"sync"
 )
+
+var mutex = &sync.Mutex{}
 
 /**
  * This is the state our server itself keeps:
@@ -39,17 +42,22 @@ func Exists(name string) bool {
  * Save state
  */
 func SaveState(state PublishrState) {
+
+	mutex.Lock()
 	state_pth := os.Getenv("HOME") + "/.publishr.json"
 	state_json, _ := json.Marshal(state)
 	f, _ := os.Create(state_pth)
 	defer f.Close()
 	f.WriteString(string(state_json))
+
+	mutex.Unlock()
 }
 
 /**
  * Load state
  */
 func LoadState() (PublishrState, error) {
+	mutex.Lock()
 
 	state_pth := os.Getenv("HOME") + "/.publishr.json"
 	state_cnt, _ := ioutil.ReadFile(state_pth)
@@ -57,8 +65,10 @@ func LoadState() (PublishrState, error) {
 	var state PublishrState
 
 	if err := json.Unmarshal(state_cnt, &state); err != nil {
+		mutex.Unlock()
 		return state, err
 	}
+	mutex.Unlock()
 	return state, nil
 
 }
