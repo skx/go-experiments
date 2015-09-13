@@ -41,8 +41,17 @@ func (r cmd_serve) name() string {
 /**
  * Server.
  */
-func (r cmd_serve) help() string {
-	return "Launch our HTTP-server."
+func (r cmd_serve) help(extended bool) string {
+	short := "Launch our HTTP-server."
+	if extended {
+		fmt.Printf("%s\n", short)
+		fmt.Printf("Extra Options:\n")
+		fmt.Printf("  --port=N Specify the port to listen upon. (8081)\n")
+		fmt.Printf("  --host=N Specify the IP to listen upon.  (127.0.0.1)\n")
+		fmt.Printf("\n")
+	}
+
+	return short
 }
 
 /**

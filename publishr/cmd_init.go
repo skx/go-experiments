@@ -26,8 +26,14 @@ func (r cmd_init) name() string {
 	return "init"
 }
 
-func (r cmd_init) help() string {
-	return "Initialize our secure secret and state."
+func (r cmd_init) help(extended bool) string {
+	short := "Initialize our secure secret and state."
+	if extended {
+		fmt.Printf("%s\n", short)
+		fmt.Printf("Extra Options:\n\tNone\n")
+	}
+
+	return short
 }
 
 /**

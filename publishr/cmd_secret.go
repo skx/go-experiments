@@ -22,8 +22,14 @@ func (r cmd_secret) name() string {
 	return "secret"
 }
 
-func (r cmd_secret) help() string {
-	return "Show our authentication-secret."
+func (r cmd_secret) help(extended bool) string {
+	short := "Show our authentication-secret."
+	if extended {
+		fmt.Printf("%s\n", short)
+		fmt.Printf("Extra Options:\n\tNone\n")
+	}
+
+	return short
 }
 
 /**

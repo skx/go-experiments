@@ -26,7 +26,7 @@ import (
 //
 type subcommand interface {
 	// Show one-line help
-	help() string
+	help(bool) string
 
 	// Get the public-facing name of the command.
 	name() string
@@ -67,11 +67,30 @@ func main() {
 	}
 
 	//
+	// Are we looking for help?
+	//
+	if (len(os.Args) == 3) && (os.Args[1] == "help") {
+		sc := os.Args[2]
+
+		//
+		// And execute it, if we found the matching class.
+		//
+		for _, ent := range known {
+			if sc == ent.name() {
+				ent.help(true)
+				os.Exit(0)
+			}
+		}
+	}
+
+	//
 	// Otherwise show the commands and their help
 	//
 	fmt.Printf("Usage: %s [subcommand]\n\nSubcommands include:\n\n", path.Base(os.Args[0]))
 
+	fmt.Printf("\t% 8s - %s\n", "help", "Show Extended help for the named subcommand")
+
 	for _, ent := range known {
-		fmt.Printf("\t% 8s - %s\n", ent.name(), ent.help())
+		fmt.Printf("\t% 8s - %s\n", ent.name(), ent.help(false))
 	}
 }
