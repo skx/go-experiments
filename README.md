@@ -14,4 +14,6 @@ Highlights include:
 * cidr-match
     * Testing if IPs are within ranges
 * hash-ids
-   * Test the hashing-library I use for generating "shortlinks"
+    * Test the hashing-library I use for generating "shortlinks"
+* publishr
+    * File upload/publishing server.
