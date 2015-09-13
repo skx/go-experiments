@@ -101,6 +101,22 @@ func NextShortID() string {
 }
 
 /**
+ * Get the remote IP-address, taking account of X-Forwarded-For.
+ */
+func getRemoteIP(r *http.Request) string {
+
+	hdrForwardedFor := r.Header.Get("X-Forwarded-For")
+	if hdrForwardedFor != "" {
+		parts := strings.Split(hdrForwardedFor, ",")
+		// TODO: should return first non-local address
+		return parts[0]
+	}
+
+	// Fall-back
+	return r.RemoteAddr
+}
+
+/**
  * Called via GET /get/XXXXXX
  */
 func GetHandler(res http.ResponseWriter, req *http.Request) {
@@ -254,7 +270,7 @@ func UploadHandler(res http.ResponseWriter, req *http.Request) {
 			// Write out the meta-data - which is a structure
 			// containing the following members.
 			//
-			md := &UploadMetaData{MIME: mimetype, IP: req.RemoteAddr, AT: time.Now().Format(time.RFC850)}
+			md := &UploadMetaData{MIME: mimetype, IP: getRemoteIP(req), AT: time.Now().Format(time.RFC850)}
 			data_json, _ := json.Marshal(md)
 
 			var meta *os.File
