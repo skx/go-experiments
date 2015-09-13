@@ -19,6 +19,7 @@ import (
 	"io"
 	"io/ioutil"
 	"mime/multipart"
+        "net"
 	"net/http"
 	"os"
 	"regexp"
@@ -113,7 +114,8 @@ func getRemoteIP(r *http.Request) string {
 	}
 
 	// Fall-back
-	return r.RemoteAddr
+        ip, _, _ := net.SplitHostPort(r.RemoteAddr)
+        return(ip)
 }
 
 /**
