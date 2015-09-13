@@ -13,7 +13,7 @@ import (
 	"mime/multipart"
 	"net/http"
 	"os"
-	"strconv"
+	"regexp"
 	"strings"
 	"time"
 )
@@ -219,8 +219,7 @@ func UploadHandler(res http.ResponseWriter, req *http.Request) {
 				return
 			}
 			// 32K buffer copy
-			var written int64
-			if written, err = io.Copy(outfile, infile); nil != err {
+			if _, err = io.Copy(outfile, infile); nil != err {
 				status = http.StatusInternalServerError
 				return
 			}
@@ -249,7 +248,17 @@ func UploadHandler(res http.ResponseWriter, req *http.Request) {
 			}
 			meta.WriteString(string(data_json)) //mimetype)
 
-			res.Write([]byte("uploaded file:" + hdr.Filename + ";link " + sn + " ;length:" + strconv.Itoa(int(written)) + " ;mime-type:" + mimetype))
+			//
+			// Write out the redirection
+			//
+			hostname := req.Host
+			scheme := "https"
+
+			match, _ := regexp.MatchString("^https", req.RequestURI)
+			if match {
+				scheme = "https"
+			}
+			res.Write([]byte(scheme + "://" + hostname + "/" + sn))
 		}
 	}
 }
