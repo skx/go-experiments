@@ -1,0 +1,43 @@
+
+Simple Files Server
+-------------------
+
+
+This program allows files to be uploaded, via HTTP-POST, and
+later read back. It can be used to store files on the move.
+
+You can upload a file like so:
+
+    curl --header X-Auth:1.2.3.4 -X POST -F "file=@/etc/motd" http://localhost:8081/upload
+
+Then get it back again like so:
+
+    curl -v http://localhost:8081/get/vO
+
+(The upload will give you the name to fetch.)
+
+
+Authentication
+--------------
+
+Uploads are protected by the "X-Auth" header, which contains a TOTP
+value based upon a shared secret.
+
+To generate the secret for the server, and view it:
+
+     publishr init
+     publishr secret
+
+
+
+Building
+--------
+
+    go get github.com/dgryski/dgoogauth
+    go get github.com/gorilla/mux
+    go get github.com/rakyll/magicmime
+    go get github.com/speps/go-hashids
+
+    apt-get install libmagic-dev
+    make
+
