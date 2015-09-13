@@ -1,9 +1,7 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"os"
 )
 
@@ -31,18 +29,15 @@ func (r cmd_secret) execute(args ...string) int {
 	path := os.Getenv("HOME") + "/.publishr.json"
 	if Exists(path) {
 
-		state_cnt, _ := ioutil.ReadFile(path)
+		state, err := LoadState()
+		if err != nil {
+			fmt.Printf("Error loading state from %s\n", path)
+		} else {
 
-		var state PublishrState
-
-		if err := json.Unmarshal(state_cnt, &state); err != nil {
-			fmt.Printf("Failed to parse %s:\n", path)
-			return 0
+			fmt.Printf("Configure your authenticator-client with the secret %s\n", state.Secret)
+			fmt.Printf("For example:\n")
+			fmt.Printf("\toathtool --totp -b %s\n", state.Secret)
 		}
-
-		fmt.Printf("Configure your authenticator-client with the secret %s\n", state.Secret)
-		fmt.Printf("For example:\n")
-		fmt.Printf("\toathtool --totp -b %s\n", state.Secret)
 	} else {
 		fmt.Printf("Not initialized - Please run 'publishr init'\n")
 	}

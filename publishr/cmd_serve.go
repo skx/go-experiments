@@ -60,15 +60,7 @@ type UploadMetaData struct {
  */
 func NextShortID() string {
 
-	path := os.Getenv("HOME") + "/.publishr.json"
-
-	state_cnt, _ := ioutil.ReadFile(path)
-
-	var state PublishrState
-
-	if err := json.Unmarshal(state_cnt, &state); err != nil {
-		panic(err)
-	}
+	state, _ := LoadState()
 
 	/**
 	 * Increase the count, and hash it.
@@ -87,25 +79,30 @@ func NextShortID() string {
 	/**
 	 * Write out the body
 	 */
-	state_json, _ := json.Marshal(state)
-	f, _ := os.Create(path)
-	defer f.Close()
-	f.WriteString(string(state_json))
-
+	SaveState(state)
 	return hash
 }
 
 /**
  * Called via GET /get/XXXXXX
  */
-func GetHandler(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
+func GetHandler(res http.ResponseWriter, req *http.Request) {
+	var (
+		status int
+		err    error
+	)
+	defer func() {
+		if nil != err {
+			http.Error(res, err.Error(), status)
+		}
+	}()
+
+	vars := mux.Vars(req)
 	fname := vars["id"]
 	fname = "./public/" + fname
 
 	if !Exists(fname) || !Exists(fname+".meta") {
-		os.Stderr.WriteString(fname + "- doesn't exist\n")
-		http.NotFound(w, r)
+		http.NotFound(res, req)
 		return
 	}
 
@@ -114,15 +111,16 @@ func GetHandler(w http.ResponseWriter, r *http.Request) {
 	var md UploadMetaData
 
 	if err := json.Unmarshal(file, &md); err != nil {
-		// TODO: 500
-		panic(err)
+		status = 500
+		err = errors.New("Loading JSON failed")
+		return
 	}
 
 	/**
 	 * Serve the file, with the correct MIME-type
 	 */
-	w.Header().Set("Content-Type", md.MIME)
-	http.ServeFile(w, r, fname)
+	res.Header().Set("Content-Type", md.MIME)
+	http.ServeFile(res, req, fname)
 }
 
 /**
@@ -156,12 +154,8 @@ func UploadHandler(res http.ResponseWriter, req *http.Request) {
 	/**
 	 * Load the secret.
 	 */
-	state_pth := os.Getenv("HOME") + "/.publishr.json"
-	state_cnt, _ := ioutil.ReadFile(state_pth)
-
-	var state PublishrState
-
-	if err := json.Unmarshal(state_cnt, &state); err != nil {
+	state, err := LoadState()
+	if err != nil {
 		status = 500
 		err = errors.New("Loading state failed")
 		return
@@ -205,11 +199,10 @@ func UploadHandler(res http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-        /**
-          * Get the short-ID
-          */
-        sn := NextShortID()
-
+	/**
+	 * Get the short-ID
+	 */
+	sn := NextShortID()
 
 	for _, fheaders := range req.MultipartForm.File {
 		for _, hdr := range fheaders {
@@ -221,7 +214,7 @@ func UploadHandler(res http.ResponseWriter, req *http.Request) {
 			}
 			// open destination
 			var outfile *os.File
-			if outfile, err = os.Create("./public/" + hdr.Filename); nil != err {
+			if outfile, err = os.Create("./public/" + sn); nil != err {
 				status = http.StatusInternalServerError
 				return
 			}
