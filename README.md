@@ -16,4 +16,4 @@ Highlights include:
 * hash-ids
     * Test the hashing-library I use for generating "shortlinks"
 * publishr
-    * File upload/publishing server.
+    * File upload/publishing server, [documented on my blog](http://blog.steve.org.uk/all_about_sharing_files_easily.html)
