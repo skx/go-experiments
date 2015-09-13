@@ -269,13 +269,13 @@ func UploadHandler(res http.ResponseWriter, req *http.Request) {
 			// Write out the redirection
 			//
 			hostname := req.Host
-			scheme := "https"
+			scheme := "http"
 
 			match, _ := regexp.MatchString("^https", req.RequestURI)
 			if match {
 				scheme = "https"
 			}
-			res.Write([]byte(scheme + "://" + hostname + "/" + sn))
+			res.Write([]byte(scheme + "://" + hostname + "/get/" + sn))
 		}
 	}
 }
