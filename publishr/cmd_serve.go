@@ -320,6 +320,9 @@ func (r cmd_serve) execute(args ...string) int {
 	/* Post a new one */
 	router.HandleFunc("/upload", UploadHandler).Methods("POST")
 
+	/* Load a logger */
+	loggingHandler := NewApacheLoggingHandler(router, os.Stderr)
+
 	/* Load the routers beneath the server root */
 	http.Handle("/", router)
 
@@ -328,7 +331,12 @@ func (r cmd_serve) execute(args ...string) int {
 
 	/* Launch the server */
 	fmt.Printf("Launching the server on http://%s\n", bind)
-	err := http.ListenAndServe(bind, nil)
+
+	server := &http.Server{
+		Addr:    fmt.Sprintf("%s:%s", *host, *port),
+		Handler: loggingHandler,
+	}
+	err := server.ListenAndServe()
 	if err != nil {
 		panic(err)
 	}
