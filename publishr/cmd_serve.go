@@ -19,10 +19,9 @@ import (
 	"io"
 	"io/ioutil"
 	"mime/multipart"
-        "net"
+	"net"
 	"net/http"
 	"os"
-	"regexp"
 	"strings"
 	"time"
 )
@@ -114,8 +113,8 @@ func getRemoteIP(r *http.Request) string {
 	}
 
 	// Fall-back
-        ip, _, _ := net.SplitHostPort(r.RemoteAddr)
-        return(ip)
+	ip, _, _ := net.SplitHostPort(r.RemoteAddr)
+	return (ip)
 }
 
 /**
@@ -284,15 +283,19 @@ func UploadHandler(res http.ResponseWriter, req *http.Request) {
 			meta.WriteString(string(data_json)) //mimetype)
 
 			//
-			// Write out the redirection
+			// Write out the redirection - using the host
+			// scheme, and the end-point of the new upload.
 			//
 			hostname := req.Host
 			scheme := "http"
 
-			match, _ := regexp.MatchString("^https", req.RequestURI)
-			if match {
+			if strings.HasPrefix(req.Proto, "HTTPS") {
 				scheme = "https"
 			}
+			if req.Header.Get("X-Forwarded-Proto") == "https" {
+				scheme = "https"
+			}
+
 			res.Write([]byte(scheme + "://" + hostname + "/get/" + sn))
 		}
 	}
