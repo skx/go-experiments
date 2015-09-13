@@ -11,6 +11,8 @@ clean:
 libs:
 	test -d $$GOPATH/github.com/speps/go-hashids || go get github.com/speps/go-hashids
 
+fmt:
+	go fmt *.go
 
 hash: libs main.go
 	go build .
