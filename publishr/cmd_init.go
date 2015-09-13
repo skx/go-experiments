@@ -9,7 +9,6 @@ package main
 import (
 	"crypto/rand"
 	"encoding/base32"
-	"encoding/json"
 	"fmt"
 	"os"
 )
@@ -52,7 +51,7 @@ func (r cmd_init) execute(args ...string) int {
 
 		secret := base32.StdEncoding.EncodeToString(sec)
 
-		state := &PublishrState{Secret: secret, Count: 0}
+		state := PublishrState{Secret: secret, Count: 0}
 
 		SaveState(state)
 
