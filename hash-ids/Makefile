@@ -9,7 +9,7 @@ clean:
 	go clean
 
 libs:
-	test -d $$GOPATH/github.com/speps/go-hashids || go get github.com/speps/go-hashids
+	go get ./...
 
 fmt:
 	go fmt *.go
