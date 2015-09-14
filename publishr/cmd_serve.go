@@ -302,7 +302,7 @@ func UploadHandler(res http.ResponseWriter, req *http.Request) {
 				scheme = "https"
 			}
 
-			res.Write([]byte(scheme + "://" + hostname + "/get/" + sn))
+			res.Write([]byte(scheme + "://" + hostname + "/get/" + sn + "\n"))
 		}
 	}
 }
