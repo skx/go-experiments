@@ -308,6 +308,21 @@ func UploadHandler(res http.ResponseWriter, req *http.Request) {
 }
 
 /**
+ * Called via GET /robots.txt
+ */
+func RobotsHandler(res http.ResponseWriter, req *http.Request) {
+	fmt.Fprintf(res, "User-agent: *\nDisallow: /")
+}
+
+/**
+ * Fallback handler, returns 404 for all requests.
+ */
+func MissingHandler(res http.ResponseWriter, req *http.Request) {
+	res.WriteHeader(http.StatusNotFound)
+	fmt.Fprintf(res, "publishr - 404 - content is not hosted here.")
+}
+
+/**
  * Launch our HTTP-server.
  */
 func (r cmd_serve) execute(args ...string) int {
@@ -325,6 +340,12 @@ func (r cmd_serve) execute(args ...string) int {
 
 	/* Post a new one */
 	router.HandleFunc("/upload", UploadHandler).Methods("POST")
+
+	/* Robots.txt handler */
+	router.HandleFunc("/robots.txt", RobotsHandler).Methods("GET")
+
+	/* Error-Handler - Return a 404 on all requests */
+	router.PathPrefix("/").HandlerFunc(MissingHandler)
 
 	/* Load the routers beneath the server root */
 	http.Handle("/", router)
