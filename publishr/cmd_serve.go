@@ -22,6 +22,7 @@ import (
 	"net"
 	"net/http"
 	"os"
+	"path/filepath"
 	"strings"
 	"time"
 )
@@ -133,6 +134,11 @@ func GetHandler(res http.ResponseWriter, req *http.Request) {
 
 	vars := mux.Vars(req)
 	fname := vars["id"]
+
+	//  Remove any suffix that might be present.
+	extension := filepath.Ext(fname)
+	fname = fname[0 : len(fname)-len(extension)]
+
 	fname = "./public/" + fname
 
 	if !Exists(fname) || !Exists(fname+".meta") {
