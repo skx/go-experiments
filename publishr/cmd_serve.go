@@ -13,7 +13,6 @@ import (
 	"flag"
 	"fmt"
 	"github.com/dgryski/dgoogauth"
-	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 	"github.com/rakyll/magicmime"
 	"github.com/speps/go-hashids"
@@ -321,9 +320,6 @@ func (r cmd_serve) execute(args ...string) int {
 	/* Post a new one */
 	router.HandleFunc("/upload", UploadHandler).Methods("POST")
 
-	/* Load a logger */
-	loggedRouter := handlers.LoggingHandler(os.Stdout, router)
-
 	/* Load the routers beneath the server root */
 	http.Handle("/", router)
 
@@ -332,7 +328,7 @@ func (r cmd_serve) execute(args ...string) int {
 
 	/* Launch the server */
 	fmt.Printf("Launching the server on http://%s\n", bind)
-	err := http.ListenAndServe(fmt.Sprintf("%s:%s", *host, *port), loggedRouter)
+	err := http.ListenAndServe(fmt.Sprintf("%s:%s", *host, *port), nil)
 	if err != nil {
 		panic(err)
 	}
