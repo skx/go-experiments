@@ -71,7 +71,6 @@ func main() {
 
 	}
 
-
 	//
 	// Are we looking for extended help?
 	//
@@ -96,6 +95,6 @@ func main() {
 	fmt.Printf("\t% 8s - %s\n", "help", "Show extended help for the named subcommand")
 
 	for _, ent := range known {
-        	fmt.Printf("\t% 8s - %s\n", ent.name(), ent.help(false))
+		fmt.Printf("\t% 8s - %s\n", ent.name(), ent.help(false))
 	}
 }

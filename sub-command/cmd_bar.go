@@ -14,13 +14,13 @@ func (r cmd_bar) name() string {
 	return "bar"
 }
 func (r cmd_bar) help(extended bool) string {
-        short := "run sub-command bar"
-        if extended {
-                fmt.Printf("%s\n\n", short)
-                fmt.Printf("Extra Options:\n\n\tNone\n\n")
-        }
+	short := "run sub-command bar"
+	if extended {
+		fmt.Printf("%s\n\n", short)
+		fmt.Printf("Extra Options:\n\n\tNone\n\n")
+	}
 
-        return short
+	return short
 }
 func (r cmd_bar) execute(args ...string) int {
 	fmt.Println("I am bar")
