@@ -34,17 +34,12 @@ or use a tool to generate a good response.
 Building & Deploying
 --------------------
 
-There are a few dependencies which must be installed, and chances are
-you'll need the `libmagic-dev` package to install one of them:
+There are a few dependencies which must be installed, and chances are you'll need the `libmagic-dev` package to install one of them:
 
     apt-get install libmagic-dev
 
-    go get github.com/dgryski/dgoogauth
-    go get github.com/gorilla/mux
-    go get github.com/rakyll/magicmime
-    go get github.com/speps/go-hashids
-
-    make
+    go get ./..
+    go build .
 
 As for deployment?  It is assumed you'll be hosting this behind a reverse
 proxy.
