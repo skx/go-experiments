@@ -86,7 +86,7 @@ func main() {
 	//
 	// Otherwise show the commands and their help
 	//
-	fmt.Printf("Usage: %s [subcommand]\n\nSubcommands include:\n\n", path.Base(os.Args[0]))
+	fmt.Printf("Usage: %s subcommand [options]\n\nSubcommands include:\n\n", path.Base(os.Args[0]))
 
 	fmt.Printf("\t% 8s - %s\n", "help", "Show Extended help for the named subcommand")
 
