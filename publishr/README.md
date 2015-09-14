@@ -38,7 +38,7 @@ There are a few dependencies which must be installed, and chances are you'll nee
 
     apt-get install libmagic-dev
 
-    go get ./...
+    go get -d ./...
     go build .
 
 As for deployment?  It is assumed you'll be hosting this behind a reverse proxy.
