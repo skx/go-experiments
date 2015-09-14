@@ -8,7 +8,7 @@ clean:
 	go clean
 
 libs:
-	test -d $$GOPATH/github.com/dgryski/dgoogauth || go get github.com/dgryski/dgoogauth
+	go get ./...
 
 
 2fa: libs main.go
