@@ -10,6 +10,8 @@ import (
 	"os/exec"
 	"reflect"
 	"strings"
+	"sync"
+	"time"
 )
 
 /**
@@ -29,6 +31,12 @@ type Information struct {
 }
 
 /**
+ * The global information set - and a mutex to protect the same.
+ */
+var info = Information{}
+var mutex = &sync.Mutex{}
+
+/**
  * Run a command, and return the output without any newlines.
  */
 func runCommand(cmd string, args ...string) string {
@@ -44,10 +52,10 @@ func runCommand(cmd string, args ...string) string {
 /**
  * Populate the structure.
  *
- * Currently this is called once per-request.  Ideally it'd be done
- * only at startup-time.
+ * This is called once at startup-time, then on a time aftewards.
+ * By default this timer will update the global variable every 60 seconds.
  */
-func GetInformation() Information {
+func updateInformation() {
 
 	/**
 	 * Some fields in our structure are arrays.
@@ -82,7 +90,12 @@ func GetInformation() Information {
 		}
 	}
 
-	i := Information{
+	/**
+	 * Update the global information - protecting access with a mutex.
+	 */
+	mutex.Lock()
+
+	info = Information{
 		ARCH:         runCommand("arch"),
 		FQDN:         runCommand("/bin/hostname", "--fqdn"),
 		LSB_Codename: runCommand("/usr/bin/lsb_release", "--short", "--codename"),
@@ -91,12 +104,15 @@ func GetInformation() Information {
 		Interfaces:   interfaces,
 		IPv4:         ipv4,
 		IPv6:         ipv6}
-	return i
+
+	mutex.Unlock()
+
 }
 
-func hello(res http.ResponseWriter, req *http.Request) {
-
-	info := GetInformation()
+/**
+ * Our HTTP-handler.
+ */
+func handler(res http.ResponseWriter, req *http.Request) {
 
 	res.Header().Set("Content-Type", "text/plain")
 
@@ -110,6 +126,7 @@ func hello(res http.ResponseWriter, req *http.Request) {
 	key = strings.Replace(key, "/", "_", -1)
 
 	if key == "" {
+		mutex.Lock()
 		jsn, err := json.Marshal(info)
 		if err == nil {
 			io.WriteString(res, string(jsn))
@@ -117,8 +134,11 @@ func hello(res http.ResponseWriter, req *http.Request) {
 			res.WriteHeader(http.StatusInternalServerError)
 			fmt.Fprintf(res, "Failed encode to JSON")
 		}
+		mutex.Unlock()
 		return
 	}
+
+	mutex.Lock()
 
 	/* Perform the reflection */
 	r := reflect.ValueOf(&info)
@@ -136,15 +156,34 @@ func hello(res http.ResponseWriter, req *http.Request) {
 
 			/* Success */
 			fmt.Fprintf(res, "%s", string(j))
+			mutex.Unlock()
 			return
 		}
 	}
+	mutex.Unlock()
 
 	res.WriteHeader(http.StatusInternalServerError)
 	fmt.Fprintf(res, "Failed to lookup value of %s", key)
 }
 
 func main() {
-	http.HandleFunc("/", hello)
+
+	/**
+	 * Ensure the information is populated.
+	 */
+	updateInformation()
+
+	/**
+	 * Update the information every 60 seconds.
+	 */
+	ticker := time.NewTicker(time.Second * 60)
+	go func() {
+		for _ = range ticker.C {
+			updateInformation()
+			fmt.Println("Information updated")
+		}
+	}()
+
+	http.HandleFunc("/", handler)
 	http.ListenAndServe(":8000", nil)
 }
