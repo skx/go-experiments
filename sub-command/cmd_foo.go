@@ -29,3 +29,7 @@ func (r cmd_foo) execute(args ...string) int {
 
 	return 0
 }
+
+func init() {
+	CMDS = append(CMDS, cmd_foo{})
+}

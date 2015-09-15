@@ -32,3 +32,7 @@ func (r cmd_bar) execute(args ...string) int {
 
 	return 0
 }
+
+func init() {
+	CMDS = append(CMDS, cmd_bar{})
+}
