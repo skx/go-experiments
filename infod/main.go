@@ -6,18 +6,28 @@ import (
 	"io"
 	"net"
 	"net/http"
-	"os"
+	"os/exec"
 	"reflect"
+	"strings"
 	"syscall"
 )
 
+/**
+ * The information structure we return to callers.
+ *
+ * Note this is deliberately "flat" and "fat".
+ */
 type Information struct {
+	ARCH       string
 	FQDN       string
 	Interfaces []string
 	IPv4       []string
 	IPv6       []string
 }
 
+/**
+ * Utility for getting uname-related information.
+ */
 type Utsname syscall.Utsname
 
 func uname() (*syscall.Utsname, error) {
@@ -41,7 +51,29 @@ func CharsToString(ca [65]int8) string {
 	return string(s[0:lens])
 }
 
+func runCommand(cmd string) string {
+
+	out, err := exec.Command(cmd).Output()
+	if err != nil {
+		return ""
+	}
+
+	return strings.Trim(string(out), "\r\n")
+}
+
+/**
+ * Populate the structure.
+ *
+ * Currently this is called once per-request.  Ideally it'd be done
+ * only at startup-time.
+ */
 func GetInformation() Information {
+
+	/**
+	 * Some fields in our structure are arrays.
+	 *
+	 * Create them.
+	 */
 	interfaces := make([]string, 0)
 	ipv4 := make([]string, 0)
 	ipv6 := make([]string, 0)
@@ -70,18 +102,16 @@ func GetInformation() Information {
 		}
 	}
 
-	hostname, _ := os.Hostname()
-
-	fmt.Printf("HOSTNAME: %s\n", hostname)
 	/**
-	 * Get hostname
+	 * Get hostname + domain-name from uname
 	 */
 	unme, _ := uname()
-
 	host_name := CharsToString(unme.Nodename)
 	domain_name := CharsToString(unme.Domainname)
 
-	i := Information{FQDN: host_name + "." + domain_name,
+	i := Information{
+		ARCH:       runCommand("/usr/bin/arch"),
+		FQDN:       host_name + "." + domain_name,
 		Interfaces: interfaces,
 		IPv4:       ipv4,
 		IPv6:       ipv6}
