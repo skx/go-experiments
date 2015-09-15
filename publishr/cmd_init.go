@@ -9,6 +9,7 @@ package main
 import (
 	"crypto/rand"
 	"encoding/base32"
+	"flag"
 	"fmt"
 	"os"
 )
@@ -29,7 +30,8 @@ func (r cmd_init) help(extended bool) string {
 	short := "Initialize our secure secret and state."
 	if extended {
 		fmt.Printf("%s\n", short)
-		fmt.Printf("Extra Options:\n\tNone\n")
+		fmt.Printf("\nExtra Options:\n")
+		fmt.Printf("  --force  For overwriting any existing secret and state.\n")
 	}
 
 	return short
@@ -40,8 +42,12 @@ func (r cmd_init) help(extended bool) string {
  */
 func (r cmd_init) execute(args ...string) int {
 
+	f1 := flag.NewFlagSet("f1", flag.ContinueOnError)
+	force := f1.Bool("force", false, "Force overwriting existing details.")
+	f1.Parse(args)
+
 	path := os.Getenv("HOME") + "/.publishr.json"
-	if !Exists(path) {
+	if !Exists(path) || *force {
 
 		sec := make([]byte, 6)
 		_, err := rand.Read(sec)
@@ -56,8 +62,7 @@ func (r cmd_init) execute(args ...string) int {
 		SaveState(state)
 
 	} else {
-		fmt.Printf("Already initialized - to remove the config please run:\n")
-		fmt.Printf("\trm -f ~/.publishr.json\n")
+		fmt.Printf("Already initialized, and running without --force\n")
 	}
 
 	path = os.Getenv("HOME") + "/public"
