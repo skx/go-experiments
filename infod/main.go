@@ -4,12 +4,12 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"log"
 	"net"
 	"net/http"
 	"os/exec"
 	"reflect"
 	"strings"
-	"syscall"
 )
 
 /**
@@ -18,46 +18,26 @@ import (
  * Note this is deliberately "flat" and "fat".
  */
 type Information struct {
-	ARCH       string
-	FQDN       string
-	Interfaces []string
-	IPv4       []string
-	IPv6       []string
+	ARCH         string
+	FQDN         string
+	LSB_Codename string
+	LSB_Release  string
+	LSB_Version  string
+	Interfaces   []string
+	IPv4         []string
+	IPv6         []string
 }
 
 /**
- * Utility for getting uname-related information.
+ * Run a command, and return the output without any newlines.
  */
-type Utsname syscall.Utsname
+func runCommand(cmd string, args ...string) string {
 
-func uname() (*syscall.Utsname, error) {
-	uts := &syscall.Utsname{}
-
-	if err := syscall.Uname(uts); err != nil {
-		return nil, err
-	}
-	return uts, nil
-}
-
-func CharsToString(ca [65]int8) string {
-	s := make([]byte, len(ca))
-	var lens int
-	for ; lens < len(ca); lens++ {
-		if ca[lens] == 0 {
-			break
-		}
-		s[lens] = uint8(ca[lens])
-	}
-	return string(s[0:lens])
-}
-
-func runCommand(cmd string) string {
-
-	out, err := exec.Command(cmd).Output()
+	out, err := exec.Command(cmd, args...).Output()
 	if err != nil {
+		log.Panic(err)
 		return ""
 	}
-
 	return strings.Trim(string(out), "\r\n")
 }
 
@@ -102,19 +82,15 @@ func GetInformation() Information {
 		}
 	}
 
-	/**
-	 * Get hostname + domain-name from uname
-	 */
-	unme, _ := uname()
-	host_name := CharsToString(unme.Nodename)
-	domain_name := CharsToString(unme.Domainname)
-
 	i := Information{
-		ARCH:       runCommand("/usr/bin/arch"),
-		FQDN:       host_name + "." + domain_name,
-		Interfaces: interfaces,
-		IPv4:       ipv4,
-		IPv6:       ipv6}
+		ARCH:         runCommand("arch"),
+		FQDN:         runCommand("/bin/hostname", "--fqdn"),
+		LSB_Codename: runCommand("/usr/bin/lsb_release", "--short", "--codename"),
+		LSB_Release:  runCommand("/usr/bin/lsb_release", "--short", "--id"),
+		LSB_Version:  runCommand("/usr/bin/lsb_release", "--short", "--release"),
+		Interfaces:   interfaces,
+		IPv4:         ipv4,
+		IPv6:         ipv6}
 	return i
 }
 
@@ -126,6 +102,12 @@ func hello(res http.ResponseWriter, req *http.Request) {
 
 	/* Get the path */
 	key := req.URL.Path[1:]
+
+	/**
+	 *  This allows:
+	 *   http://example.com:800/LSB/Release -> LSB_Release
+	 */
+	key = strings.Replace(key, "/", "_", -1)
 
 	if key == "" {
 		jsn, err := json.Marshal(info)
