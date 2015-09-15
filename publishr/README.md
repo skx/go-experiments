@@ -38,7 +38,13 @@ There are a few dependencies which must be installed, and chances are you'll nee
 
     apt-get install libmagic-dev
 
+If you're running beneath `$GOPATH/src` you can build via:
+
     go get -d ./...
     go build .
+
+Otherwise you should use the provided `Makefile` to fetch the dependencies explicitly and build:
+
+    make
 
 As for deployment?  It is assumed you'll be hosting this behind a reverse proxy.
