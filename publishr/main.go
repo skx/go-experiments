@@ -36,14 +36,14 @@ type subcommand interface {
 }
 
 //
+// Global array of registered sub-commands
+//
+var CMDS = []subcommand{}
+
+//
 // Entry-point.
 //
 func main() {
-
-	//
-	// The subcommands we know about
-	//
-	known := []subcommand{cmd_init{}, cmd_secret{}, cmd_serve{}}
 
 	//
 	// If we have at least one argument
@@ -58,7 +58,7 @@ func main() {
 		//
 		// And execute it, if we found the matching class.
 		//
-		for _, ent := range known {
+		for _, ent := range CMDS {
 			if sc == ent.name() {
 				os.Exit(ent.execute(os.Args[2:]...))
 			}
@@ -75,7 +75,7 @@ func main() {
 		//
 		// And execute it, if we found the matching class.
 		//
-		for _, ent := range known {
+		for _, ent := range CMDS {
 			if sc == ent.name() {
 				ent.help(true)
 				os.Exit(0)
@@ -90,7 +90,7 @@ func main() {
 
 	fmt.Printf("\t% 8s - %s\n", "help", "Show Extended help for the named subcommand")
 
-	for _, ent := range known {
+	for _, ent := range CMDS {
 		fmt.Printf("\t% 8s - %s\n", ent.name(), ent.help(false))
 	}
 }

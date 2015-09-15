@@ -67,3 +67,7 @@ func (r cmd_init) execute(args ...string) int {
 
 	return 0
 }
+
+func init() {
+	CMDS = append(CMDS, cmd_init{})
+}

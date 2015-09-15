@@ -54,3 +54,7 @@ func (r cmd_secret) execute(args ...string) int {
 	}
 	return 0
 }
+
+func init() {
+	CMDS = append(CMDS, cmd_secret{})
+}
