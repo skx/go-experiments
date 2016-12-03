@@ -16,6 +16,8 @@ Highlights include:
     * Testing if IPs are within ranges.
 * hash-ids
     * Test the hashing-library I use for generating "shortlinks".
+* plugins
+    * Simple example code of invoking code dynamically via the new golang plugin interface.
 * publishr
     * File upload/publishing server, [documented on my blog](http://blog.steve.org.uk/all_about_sharing_files_easily.html)
 * infod
