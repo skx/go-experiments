@@ -8,6 +8,8 @@ Highlights include:
 * 2fa
     * Authentication using TOTP.
     * This is usually used to add two-factor support, in addition to username/password.
+* class_factory
+    * A simple class-factory example.
 * sub-command
     * Writing binaries that allow subcommands.
 * local-ip
